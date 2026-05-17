@@ -77,19 +77,17 @@ body.theme-discoteca { background: radial-gradient(circle, #250036, #000000); --
     box-sizing: border-box; border: 1px solid rgba(255,255,255,0.02); height: 100%; overflow: hidden;
 }
 .bingo-row { display: flex; align-items: center; height: 19%; gap: 4px; }
-.letter-header { width: 35px; font-size: 26px; font-weight: 900; text-align: center; color: #ffd400; }
+.letter-header { width: 45px; font-size: 32px; font-weight: 900; text-align: center; color: #ffd400; }
 
 .numbers-subgrid { 
     flex: 1; display: grid; grid-template-columns: repeat(15, 1fr); gap: 2px; height: 100%; align-items: center;
 }
 
 .num-btn {
-    border: none; font-weight: bold; font-size: 12px; border-radius: 5px;
+    border: none; font-weight: bold; border-radius: 5px;
     background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); cursor: pointer;
     display: flex; justify-content: center; align-items: center; height: 85%; width: 100%; box-sizing: border-box; padding: 0;
 }
-@media (min-width: 900px) { .num-btn { font-size: 14px; } .letter-header { font-size: 32px; width: 45px;} }
-
 .num-btn span { display: block; width: 100%; text-align: center; pointer-events: none; }
 
 /* FORMAS GEOMÉTRICAS */
@@ -104,7 +102,7 @@ body.theme-discoteca { background: radial-gradient(circle, #250036, #000000); --
 .shape-cruzado { border-radius: 10px 3px 10px 3px; }
 
 .num-btn.marked {
-    background: #00cc44 !important; color: white !important; font-size: 14px; box-shadow: 0 0 8px #00ff55;
+    background: #00cc44 !important; color: white !important; box-shadow: 0 0 8px #00ff55;
 }
 
 /* INTERRUPTORES AJUSTES */
@@ -130,11 +128,11 @@ body.theme-discoteca { background: radial-gradient(circle, #250036, #000000); --
 
 /* POPUPS COMPLETAMENTE REDISEÑADOS Y OPERATIVOS */
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 20000; }
-.popup-ball-content { text-align: center; animation: ballZoom 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.2); }
+.popup-ball-content { text-align: center; animation: ballZoom 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.2); padding: 20px; width: 90%; }
 @keyframes ballZoom { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-#bingo-popup-title { font-size: 80px; color: #ffd400; text-shadow: 0 0 30px #ffd400; font-weight: 900; margin: 0; line-height: 1; }
-#bingo-popup-phrase { font-size: 28px; color: #ffffff; margin-top: 15px; font-family: sans-serif; font-weight: bold; }
+#bingo-popup-title { color: #ffd400; text-shadow: 0 0 30px #ffd400; font-weight: 900; margin: 0; line-height: 1; }
+#bingo-popup-phrase { color: #ffffff; margin-top: 15px; font-weight: bold; line-height: 1.2; }
 
 /* CONFIGURACIÓN SIDEBAR */
 .settings-btn {
@@ -153,6 +151,9 @@ body.theme-discoteca { background: radial-gradient(circle, #250036, #000000); --
 h4 { margin: 6px 0 2px 0; color: #ffd400; font-size: 10px; text-transform: uppercase; }
 .panel-label { font-size: 10px; color: #aaa; font-weight: bold; display: block; margin-bottom: 2px; }
 select, input { padding: 4px 6px; border-radius: 5px; background: #141414; border: 1px solid #2b2b2b; color: white; font-size: 11px; width: 100%; box-sizing: border-box; }
+.slider-container { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.slider-container input[type="range"] { flex: 1; accent-color: #ffd400; padding: 0; }
+.slider-val { font-size: 10px; color: #ffd400; font-weight: bold; width: 30px; text-align: right; }
 .version-branding { margin-top: auto; padding-top: 10px; text-align: center; font-family: 'Impact', sans-serif; font-size: 13px; color: var(--version-color); text-shadow: 0 0 6px var(--version-color); border-top: 1px dashed rgba(255,255,255,0.1); }
 </style>
 </head>
@@ -218,6 +219,31 @@ select, input { padding: 4px 6px; border-radius: 5px; background: #141414; borde
         <div class="ios-switch" id="sw-voiceGender" onclick="toggleSwitch('voiceGender')">
             <span class="switch-text text-on">ON</span><span class="switch-text text-off">OFF</span>
         </div>
+    </div>
+
+    <h4>Tamaños de Letra (Control TV)</h4>
+    <label class="panel-label">Números del Tablero (1-75)</label>
+    <div class="slider-container">
+        <input type="range" id="sl-sizeMaster" min="10" max="36" value="14" oninput="liveUpdateSliders()">
+        <span class="slider-val" id="val-sizeMaster">14px</span>
+    </div>
+
+    <label class="panel-label">Letrero Gigante "¡BINGO!"</label>
+    <div class="slider-container">
+        <input type="range" id="sl-sizeBingoTitle" min="40" max="180" value="80" oninput="liveUpdateSliders()">
+        <span class="slider-val" id="val-sizeBingoTitle">80px</span>
+    </div>
+
+    <label class="panel-label">Mensaje/Frase de Ganador</label>
+    <div class="slider-container">
+        <input type="range" id="sl-sizeBingoPhrase" min="16" max="70" value="28" oninput="liveUpdateSliders()">
+        <span class="slider-val" id="val-sizeBingoPhrase">28px</span>
+    </div>
+
+    <label class="panel-label">Balota Gigante al Cantar</label>
+    <div class="slider-container">
+        <input type="range" id="sl-sizeBallPop" min="50" max="220" value="120" oninput="liveUpdateSliders()">
+        <span class="slider-val" id="val-sizeBallPop">120px</span>
     </div>
 
     <h4>Tiempos Automáticos</h4>
@@ -288,25 +314,26 @@ select, input { padding: 4px 6px; border-radius: 5px; background: #141414; borde
 </div>
 
 <script>
-let config = JSON.parse(localStorage.getItem("bingo_app_v9")) || {
+let config = JSON.parse(localStorage.getItem("bingo_app_v10")) || {
     sound: "on", voice: "on", voiceGender: "off",
-    fontLet: "Arial Black", fontNum: "Impact", sizeLet: "90", sizeNum: "120",
+    sizeMaster: "14", sizeBingoTitle: "80", sizeBingoPhrase: "28", sizeBallPop: "120",
     particleEffect: "confetti", theme: "casino", popBg: "oscuro", boardShape: "cuadrado", figureIndex: 0, popDuration: "3500"
 };
 
 let markedNumbers = new Set();
 let autoCloseTimeout = null;
-let bingoInterval = null; // Control de fuegos continuos en el Bingo
+let bingoInterval = null; 
 const clickSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3");
 
-// FRASES ALEATORIAS PARA EL GANADOR
+// FRASES ALEATORIAS CON EMOJIS INCORPORADOS
 const bingoPhrases = [
-    "¡Tenemos un Ganador!",
-    "¡Bingo Confirmado!",
-    "¡Suerte Suprema!",
-    "¡Alguien se lleva el Premio!",
-    "¡Terminó la Ronda!",
-    "¡Revisen ese Cartón!"
+    "¡Tenemos un Ganador! 🏆🥳",
+    "¡Bingo Confirmado! 🎉✨",
+    "¡Suerte Suprema! 👑🎰",
+    "¡Alguien se lleva el Premio! 💰🎁",
+    "¡Terminó la Ronda! 🏁🔥",
+    "¡Revisen ese Cartón! 👀📋",
+    "¡Súper Bingo Ganador! 🌟🚀"
 ];
 
 const figuresLibrary = [
@@ -366,6 +393,7 @@ const figuresLibrary = [
 window.onload = function() {
     buildMasterBoardUI();
     populateFiguresDropdown();
+    syncSlidersUI();
     renderStateUI();
     drawMiniFigureGrid(figuresLibrary[config.figureIndex].matrix);
 };
@@ -377,6 +405,18 @@ function populateFiguresDropdown() {
         let op = document.createElement("option"); op.value = idx; op.innerText = fig.name;
         sel.appendChild(op);
     });
+}
+
+function syncSlidersUI() {
+    document.getElementById("sl-sizeMaster").value = config.sizeMaster || "14";
+    document.getElementById("sl-sizeBingoTitle").value = config.sizeBingoTitle || "80";
+    document.getElementById("sl-sizeBingoPhrase").value = config.sizeBingoPhrase || "28";
+    document.getElementById("sl-sizeBallPop").value = config.sizeBallPop || "120";
+    
+    document.getElementById("val-sizeMaster").innerText = (config.sizeMaster || "14") + "px";
+    document.getElementById("val-sizeBingoTitle").innerText = (config.sizeBingoTitle || "80") + "px";
+    document.getElementById("val-sizeBingoPhrase").innerText = (config.sizeBingoPhrase || "28") + "px";
+    document.getElementById("val-sizeBallPop").innerText = (config.sizeBallPop || "120") + "px";
 }
 
 function renderStateUI() {
@@ -396,14 +436,35 @@ function renderStateUI() {
         else { element.classList.remove("active"); }
     });
 
+    // Aplicar tamaños dinámicos desde la configuración
     document.querySelectorAll(".num-btn").forEach(btn => {
         btn.className = "num-btn " + "shape-" + config.boardShape + (markedNumbers.has(parseInt(btn.innerText)) ? " marked" : "");
+        btn.style.fontSize = (config.sizeMaster || "14") + "px";
     });
+
+    document.getElementById("bingo-popup-title").style.fontSize = (config.sizeBingoTitle || "80") + "px";
+    document.getElementById("bingo-popup-phrase").style.fontSize = (config.sizeBingoPhrase || "28") + "px";
+    
+    const popLetter = document.getElementById("pop-letter");
+    const popNumber = document.getElementById("pop-number");
+    popLetter.style.fontSize = (config.sizeBallPop || "120") + "px";
+    popNumber.style.fontSize = (config.sizeBallPop || "120") + "px";
+}
+
+function liveUpdateSliders() {
+    config.sizeMaster = document.getElementById("sl-sizeMaster").value;
+    config.sizeBingoTitle = document.getElementById("sl-sizeBingoTitle").value;
+    config.sizeBingoPhrase = document.getElementById("sl-sizeBingoPhrase").value;
+    config.sizeBallPop = document.getElementById("sl-sizeBallPop").value;
+    
+    syncSlidersUI();
+    localStorage.setItem("bingo_app_v10", JSON.stringify(config));
+    renderStateUI();
 }
 
 function toggleSwitch(key) {
     config[key] = config[key] === "on" ? "off" : "on";
-    localStorage.setItem("bingo_app_v9", JSON.stringify(config));
+    localStorage.setItem("bingo_app_v10", JSON.stringify(config));
     renderStateUI();
 }
 
@@ -413,7 +474,7 @@ function liveUpdate() {
     config.popBg = document.getElementById("cfg-pop-bg").value;
     config.boardShape = document.getElementById("cfg-board-shape").value;
     config.popDuration = document.getElementById("cfg-pop-duration").value;
-    localStorage.setItem("bingo_app_v9", JSON.stringify(config));
+    localStorage.setItem("bingo_app_v10", JSON.stringify(config));
     renderStateUI();
 }
 
@@ -471,34 +532,29 @@ function triggerGiantBallPopup(letter, number) {
     overlay.className = "overlay pop-bg-" + config.popBg;
     lSpan.innerText = letter + " "; nSpan.innerText = number;
     
-    lSpan.style.fontFamily = config.fontLet; lSpan.style.fontSize = config.sizeLet + "px"; lSpan.style.color = "#ffd400";
-    nSpan.style.fontFamily = config.fontNum; nSpan.style.fontSize = config.sizeNum + "px"; nSpan.style.color = "#ffffff";
+    lSpan.style.fontFamily = 'Arial Black'; lSpan.style.color = "#ffd400";
+    nSpan.style.fontFamily = 'Impact'; nSpan.style.color = "#ffffff";
 
     overlay.style.display = "flex";
 }
 
 function closeBallPopup() { document.getElementById("ball-popup-overlay").style.display = "none"; }
 
-/* FUNCIONALIDAD DEL BOTÓN BINGO RESTAURADA COMPLETAMENTE */
 function triggerBingoModal() {
     const overlay = document.getElementById("bingo-popup-overlay");
     const phraseDiv = document.getElementById("bingo-popup-phrase");
 
     overlay.className = "overlay pop-bg-" + config.popBg;
     
-    // Elegir frase aleatoria de la biblioteca
+    // Frase aleatoria con emojis fijos en la biblioteca
     const randomPhrase = bingoPhrases[Math.floor(Math.random() * bingoPhrases.length)];
     phraseDiv.innerText = randomPhrase;
 
     overlay.style.display = "flex";
-
-    // Lanzar ráfaga inicial de partículas
     runParticleCelebration(true);
 
-    // Cantar "Bingo" a través del sintetizador de voz si está activo
     executeVoiceSynthesis("¡Bingo, Bingo, tenemos un posible ganador!", config.voiceGender === "on" ? "male" : "female");
 
-    // Efecto de ráfagas continuas de confeti/fuegos mientras el cartel esté abierto
     if (bingoInterval) clearInterval(bingoInterval);
     bingoInterval = setInterval(() => {
         runParticleCelebration(true);
@@ -586,7 +642,7 @@ function loadSpecificFigure(idx) {
     document.getElementById("cfg-figure-select").value = idx;
     document.getElementById("figure-title-label").innerText = "FIGURA: " + figuresLibrary[config.figureIndex].name;
     drawMiniFigureGrid(figuresLibrary[config.figureIndex].matrix);
-    localStorage.setItem("bingo_app_v9", JSON.stringify(config));
+    localStorage.setItem("bingo_app_v10", JSON.stringify(config));
 }
 
 function toggleSettings() { document.getElementById("settings-panel").classList.toggle("open"); }
@@ -594,11 +650,4 @@ function toggleSettings() { document.getElementById("settings-panel").classList.
 function resetSystem() {
     if(confirm("¿Reiniciar el tablero?")) {
         markedNumbers.clear();
-        document.getElementById("left-display-ball").innerText = "--";
-        buildMasterBoardUI();
-        renderStateUI();
-    }
-}
-</script>
-</body>
-</html>
+        document.getElementById("left-display-ball
