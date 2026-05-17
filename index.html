@@ -128,10 +128,13 @@ body.theme-discoteca { background: radial-gradient(circle, #250036, #000000); --
 .ios-switch.active .text-on { display: block; }
 .ios-switch.active .text-off { display: none; }
 
-/* POPUPS */
+/* POPUPS COMPLETAMENTE REDISEÑADOS Y OPERATIVOS */
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 20000; }
 .popup-ball-content { text-align: center; animation: ballZoom 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.2); }
 @keyframes ballZoom { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+#bingo-popup-title { font-size: 80px; color: #ffd400; text-shadow: 0 0 30px #ffd400; font-weight: 900; margin: 0; line-height: 1; }
+#bingo-popup-phrase { font-size: 28px; color: #ffffff; margin-top: 15px; font-family: sans-serif; font-weight: bold; }
 
 /* CONFIGURACIÓN SIDEBAR */
 .settings-btn {
@@ -183,6 +186,13 @@ select, input { padding: 4px 6px; border-radius: 5px; background: #141414; borde
 <div class="overlay pop-bg-oscuro" id="ball-popup-overlay" onclick="closeBallPopup()">
     <div class="popup-ball-content">
         <span id="pop-letter">B</span><span id="pop-number">00</span>
+    </div>
+</div>
+
+<div class="overlay pop-bg-oscuro" id="bingo-popup-overlay" onclick="closeBingoPopup()">
+    <div class="popup-ball-content">
+        <div id="bingo-popup-title">¡BINGO!</div>
+        <div id="bingo-popup-phrase">Tenemos un ganador</div>
     </div>
 </div>
 
@@ -286,11 +296,20 @@ let config = JSON.parse(localStorage.getItem("bingo_app_v9")) || {
 
 let markedNumbers = new Set();
 let autoCloseTimeout = null;
+let bingoInterval = null; // Control de fuegos continuos en el Bingo
 const clickSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3");
 
-// ================= BIBLIOTECA COMPLETA RESTAURADA =================
+// FRASES ALEATORIAS PARA EL GANADOR
+const bingoPhrases = [
+    "¡Tenemos un Ganador!",
+    "¡Bingo Confirmado!",
+    "¡Suerte Suprema!",
+    "¡Alguien se lleva el Premio!",
+    "¡Terminó la Ronda!",
+    "¡Revisen ese Cartón!"
+];
+
 const figuresLibrary = [
-    // GEOMÉTRICAS Y CLÁSICAS
     { name: "Patrón X", matrix: [0,4,6,8,12,16,18,20,24] },
     { name: "Marco Exterior", matrix: [0,1,2,3,4,5,9,10,14,15,19,20,21,22,23,24] },
     { name: "Marco Interior", matrix: [6,7,8,11,13,16,17,18] },
@@ -307,8 +326,6 @@ const figuresLibrary = [
     { name: "Signo Más (+)", matrix: [2,7,10,11,12,13,14,17,22] },
     { name: "Signo Menos (-)", matrix: [10,11,12,13,14] },
     { name: "Diamante", matrix: [2,6,8,10,14,16,18,22] },
-    
-    // TEMÁTICAS ESPECIALES
     { name: "Árbol Navidad 🎄", matrix: [2,7,11,12,13,15,16,17,18,19,22] },
     { name: "Calabaza Halloween 🎃", matrix: [1,2,3,5,7,9,10,12,14,15,17,19,21,22,23] },
     { name: "Corona Imperial 👑", matrix: [0,2,4,5,7,9,10,11,12,13,14,15,19,20,21,22,23,24] },
@@ -317,8 +334,6 @@ const figuresLibrary = [
     { name: "Avión Comercial ✈️", matrix: [2,7,10,11,12,13,14,17,20,22,24] },
     { name: "Sombrero Mago 🎩", matrix: [2,7,11,12,13,15,16,17,18,19,20,21,22,23,24] },
     { name: "Copa Campeón 🏆", matrix: [0,1,2,3,4,6,7,8,12,17,21,22,23] },
-    
-    // ABECEDARIO COMPLETO (A-Z)
     { name: "Letra A", matrix: [2,6,8,10,11,12,13,14,15,19,20,24] },
     { name: "Letra B", matrix: [0,1,2,3,5,9,10,11,12,13,15,19,20,21,22,23] },
     { name: "Letra C", matrix: [0,1,2,3,4,5,10,15,20,21,22,23,24] },
@@ -345,8 +360,6 @@ const figuresLibrary = [
     { name: "Letra X", matrix: [0,4,6,8,12,16,18,20,24] },
     { name: "Letra Y", matrix: [0,4,6,8,12,17,22] },
     { name: "Letra Z", matrix: [0,1,2,3,4,8,12,16,20,21,22,23,24] },
-    
-    // CARTÓN LLENO FINAL
     { name: "Cartón Lleno 🏆", matrix: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] }
 ];
 
@@ -466,6 +479,40 @@ function triggerGiantBallPopup(letter, number) {
 
 function closeBallPopup() { document.getElementById("ball-popup-overlay").style.display = "none"; }
 
+/* FUNCIONALIDAD DEL BOTÓN BINGO RESTAURADA COMPLETAMENTE */
+function triggerBingoModal() {
+    const overlay = document.getElementById("bingo-popup-overlay");
+    const phraseDiv = document.getElementById("bingo-popup-phrase");
+
+    overlay.className = "overlay pop-bg-" + config.popBg;
+    
+    // Elegir frase aleatoria de la biblioteca
+    const randomPhrase = bingoPhrases[Math.floor(Math.random() * bingoPhrases.length)];
+    phraseDiv.innerText = randomPhrase;
+
+    overlay.style.display = "flex";
+
+    // Lanzar ráfaga inicial de partículas
+    runParticleCelebration(true);
+
+    // Cantar "Bingo" a través del sintetizador de voz si está activo
+    executeVoiceSynthesis("¡Bingo, Bingo, tenemos un posible ganador!", config.voiceGender === "on" ? "male" : "female");
+
+    // Efecto de ráfagas continuas de confeti/fuegos mientras el cartel esté abierto
+    if (bingoInterval) clearInterval(bingoInterval);
+    bingoInterval = setInterval(() => {
+        runParticleCelebration(true);
+    }, 700);
+}
+
+function closeBingoPopup() {
+    document.getElementById("bingo-popup-overlay").style.display = "none";
+    if (bingoInterval) {
+        clearInterval(bingoInterval);
+        bingoInterval = null;
+    }
+}
+
 function runParticleCelebration(isBingo = false) {
     let mode = config.particleEffect;
     let mult = isBingo ? 3 : 1;
@@ -473,7 +520,7 @@ function runParticleCelebration(isBingo = false) {
 
     if (mode === "confetti") { confetti({ particleCount: 85 * mult, spread: 85, origin: { y: 0.6 }, zIndex: targetZ }); } 
     else if (mode === "nieve") {
-        let end = Date.now() + 2000;
+        let end = Date.now() + (isBingo ? 3000 : 2000);
         (function frame() {
             confetti({ particleCount: 3, angle: 270, spread: 360, startVelocity: 12, origin: { x: Math.random(), y: 0 }, colors: ['#ffffff'], zIndex: targetZ });
             if (Date.now() < end) { requestAnimationFrame(frame); }
@@ -495,7 +542,7 @@ function runParticleCelebration(isBingo = false) {
     } 
     else if (mode === "stars") { confetti({ particleCount: 75 * mult, spread: 130, colors: ['#ffd700', '#ffffff'], zIndex: targetZ }); } 
     else if (mode === "fuegos") {
-        let duration = 1500; let animationEnd = Date.now() + duration;
+        let duration = isBingo ? 2500 : 1500; let animationEnd = Date.now() + duration;
         let interval = setInterval(function() {
             if (Date.now() > animationEnd) { return clearInterval(interval); }
             confetti({ startVelocity: 30, spread: 360, particleCount: 40, origin: { x: Math.random() * 0.4 + 0.3, y: Math.random() - 0.1 }, zIndex: targetZ });
@@ -506,8 +553,6 @@ function runParticleCelebration(isBingo = false) {
         confetti({ particleCount: 45 * mult, angle: 120, spread: 60, origin: { x: 1, y: 0.9 }, colors: ['#ffff00', '#ff0055'], zIndex: targetZ });
     }
 }
-
-function triggerBingoModal() { runParticleCelebration(true); }
 
 function executeVoiceSynthesis(phrase, gender) {
     if (config.voice !== "on") return;
