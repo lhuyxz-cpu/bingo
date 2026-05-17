@@ -650,4 +650,11 @@ function toggleSettings() { document.getElementById("settings-panel").classList.
 function resetSystem() {
     if(confirm("¿Reiniciar el tablero?")) {
         markedNumbers.clear();
-        document.getElementById("left-display-ball
+        document.getElementById("left-display-ball").innerText = "--";
+        buildMasterBoardUI();
+        renderStateUI();
+    }
+}
+</script>
+</body>
+</html>
